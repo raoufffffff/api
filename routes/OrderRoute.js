@@ -188,7 +188,7 @@ OrderRoute.put('/livrorcancel/:id', async (req, res) => {
             res.send({ "success": true, "message": "cancel is successful" })
             return
         }
-        res.send({ "success": false, "message": "something went wrong" })
+        res.send({ "success": false, "message": "something went wrong2" })
     } catch (error) {
         res.send(error)
     }
