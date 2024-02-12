@@ -146,7 +146,7 @@ OrderRoute.put('/livrorcancel/:id', async (req, res) => {
             res.send({ "success": false, 'message': 'you can not do this' })
             return
         }
-        if (order.livrorId == livror._id) {
+       
             if (userNotResponds) {
                 order.userNotResponds = true
                 order.Cancelled = true
@@ -185,9 +185,11 @@ OrderRoute.put('/livrorcancel/:id', async (req, res) => {
             livror.haveorder = {}
             const result = await Order.findByIdAndUpdate(id, order)
             const livrorResult = await Livror.findByIdAndUpdate(livrorid, livror)
+        if(result && livrorResult){
             res.send({ "success": true, "message": "cancel is successful" })
             return
         }
+       
         res.send({ "success": false, "message": "something went wrong2" })
     } catch (error) {
         res.send(error)
