@@ -23,7 +23,7 @@ LivrorRoute.get('/:id', async (req, res) => {
     }
 })
 
-LivrorRoute.get('/online', async (req, res) => {
+LivrorRoute.get('/online/true', async (req, res) => {
     try {
         let result = await Livror.find()
         if (result) {
@@ -32,6 +32,26 @@ LivrorRoute.get('/online', async (req, res) => {
             return
         }
         res.send({ "success": false, 'message': 'somting went wrong' })
+    } catch (error) {
+        res.send(error)
+    }
+})
+
+LivrorRoute.get('reset/:id', async (req, res) => {
+    const { id } = req.params
+    try {
+        let livror = await Livror.findById(id)
+        if (livror) {
+            livror.haveorder = {
+                working: false
+            }
+            const result = await Livror.findByIdAndUpdate(id, livror)
+            if (result) return res.send({ "success": true, 'result': result })
+            res.send({ "success": false, 'message': "can't update" })
+            return
+        }
+        res.send({ "success": false, 'message': 'somting went wrong' })
+
     } catch (error) {
         res.send(error)
     }
