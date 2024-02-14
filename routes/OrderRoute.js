@@ -132,7 +132,6 @@ OrderRoute.put('/livror/:id', async (req, res) => {
 OrderRoute.put('/livrorcancel/:id', async (req, res) => {
     const { id } = req.params
     const livrorid = req.body.livrorid
-    const userNotResponds = req.body.userNotResponds
     const cose = req.body.cose
     try {
         let order = await Order.findById(id)
@@ -146,31 +145,7 @@ OrderRoute.put('/livrorcancel/:id', async (req, res) => {
             res.send({ "success": false, 'message': 'you can not do this' })
             return
         }
-       
-            if (userNotResponds) {
-                order.userNotResponds = true
-                order.Cancelled = true
-                order.numberOfCanceling += 1
-                order.whyCancelled = [{
-                    whocancel: livror._id,
-                    cose: "the user not responding"
-                }, ...order.whyCancelled]
-                livror.cancelOrders += 1
-                livror.orders -= 1
-                 livror.haveorder = {
-                orderID: "",
-                workin: false
-            }
-                const livrorResult = await Livror.findByIdAndUpdate(livrorid, livror)
-                const result = await Order.findByIdAndUpdate(id, order)
-                // user isso
-                const user = await User.findById(order.user.userId)
-                if (!user) return res.send({ "success": false, 'message': 'somthing went wrong' })
-                user.cancelOrders += 1
-                let b = await User.findByIdAndUpdate(user._id, user)
-                res.send({ "success": true, "message": "we are vary soory for this order" })
-                return
-            }
+        if (order.livrorId == livror._id) {
             order.IsAvailable = true
             order.IsLivrorAccepts = false
             order.livrorId = ""
@@ -187,17 +162,60 @@ OrderRoute.put('/livrorcancel/:id', async (req, res) => {
                 cose: cose
             }, ...order.whyCancelled]
             livror.haveorder = {
-                 orderID: "",
                 workin: false
             }
             const result = await Order.findByIdAndUpdate(id, order)
             const livrorResult = await Livror.findByIdAndUpdate(livrorid, livror)
-        if(livrorResult){
-            res.send({ "success": true, "result": livrorResult })
+            res.send({ "success": true, "message": "cancel is successful" })
             return
         }
-       
-        res.send({ "success": false, "message": "something went wrong2" })
+        res.send({ "success": false, "message": "something went wrong" })
+    } catch (error) {
+        res.send(error)
+    }
+})
+
+// livror cancel becose user not res
+OrderRoute.put('/usernot/res/:id', async (req, res) => {
+    const { id } = req.params
+    const livrorid = req.body.livrorid
+    try {
+        let order = await Order.findById(id)
+        let livror = await Livror.findById(livrorid)
+        console.log(order);
+        if (!order) {
+            res.send({ "success": false, 'message': 'something went wrong' })
+            return
+        }
+        if (!livror) {
+            res.send({ "success": false, 'message': 'you can not do this' })
+            return
+        }
+        if (order.livrorId == livror._id) {
+            order.userNotResponds = true
+            order.Cancelled = true
+            order.numberOfCanceling += 1
+            order.whyCancelled = [{
+                whocancel: livror._id,
+                cose: "the user not responding"
+            }, ...order.whyCancelled]
+            // 
+            livror.cancelOrders += 1
+            livror.orders -= 1
+            livror.haveorder = {
+                working: false
+            }
+            // 
+            await Livror.findByIdAndUpdate(livrorid, livror)
+            await Order.findByIdAndUpdate(id, order)
+            // user isso
+            const user = await User.findById(order.user.userId)
+            if (!user) return res.send({ "success": false, 'message': 'somthing went wrong' })
+            user.cancelOrders += 1
+            await User.findByIdAndUpdate(user._id, user)
+            res.send({ "success": true, "message": "we are vary soory for this order" })
+            return
+        }
     } catch (error) {
         res.send(error)
     }
@@ -325,6 +343,7 @@ OrderRoute.put('/usercancell/:id', async (req, res) => {
         order.Cancelled = true;
         order.IsAvailable = false;
         order.numberOfCanceling += 1;
+        order.userCancled = true
         order.whyCancelled = [{
             who: user._id,
             cose: cose
