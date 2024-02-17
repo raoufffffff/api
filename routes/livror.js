@@ -37,8 +37,8 @@ LivrorRoute.get('/online/true', async (req, res) => {
     }
 })
 
-LivrorRoute.get('reset/:id', async (req, res) => {
-    const { id } = req.params
+LivrorRoute.put('reset/nikmoook', async (req, res) => {
+    const { id } = req.body
     try {
         let livror = await Livror.findById(id)
         if (livror) {
