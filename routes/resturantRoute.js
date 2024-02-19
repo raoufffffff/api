@@ -74,7 +74,7 @@ AllResturnts.get('/all/remove', async (req, res) => {
         if (rest) {
             const body = { open: true }
             for (let i = 0; i < rest.length; i++) {
-                let a = await Resturant.findByIdAndUpdate(rest[i]._id, body)
+               let a = await Resturant.findByIdAndDelete(rest[i]._id)
                 console.log(a);
                 console.log('good');
             }
