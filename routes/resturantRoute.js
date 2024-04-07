@@ -1,11 +1,23 @@
 const express = require('express')
 const AllResturnts = express.Router()
 const Resturant = require('../models/resturants')
-
+const Order = require('../models/Oder')
 
 AllResturnts.get('/', async (req, res) => {
     try {
         const rest = await Resturant.find()
+        if (rest) return res.send({ "seccess": true, "lenght": rest.length, "result": rest })
+        res.send({ "seccess": false, 'message': 'somthing went wrong' })
+    } catch (error) {
+        res.send(error)
+    }
+})
+
+AllResturnts.get('/order/:id', async (req, res) => {
+    const { id } = req.params
+    try {
+        let rest = await Order.find()
+        rest = rest.filter(e => e.receives.receivesId === id)
         if (rest) return res.send({ "seccess": true, "lenght": rest.length, "result": rest })
         res.send({ "seccess": false, 'message': 'somthing went wrong' })
     } catch (error) {
@@ -74,7 +86,7 @@ AllResturnts.get('/all/remove', async (req, res) => {
         if (rest) {
             const body = { open: true }
             for (let i = 0; i < rest.length; i++) {
-               let a = await Resturant.findByIdAndDelete(rest[i]._id)
+                let a = await Resturant.findByIdAndDelete(rest[i]._id)
                 console.log(a);
                 console.log('good');
             }
@@ -96,6 +108,7 @@ AllResturnts.post('/', async (req, res) => {
     body.minOrder = 0
     body.whorate = [],
         body.logo = ""
+    body.img = ""
     body.stars = {
         index: 0,
         total: 0
