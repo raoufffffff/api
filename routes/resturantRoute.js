@@ -131,8 +131,15 @@ AllResturnts.post('/', async (req, res) => {
 
 AllResturnts.put('/update/:id', async (req, res) => {
     const { id } = req.params
-    const body = req.body
+    let body = req.body
     try {
+        const result = await Resturant.findById(id)
+        if (result.img != "") {
+            body.img = result.img
+        }
+        if (result.logo != "") {
+            body.logo = result.logo
+        }
         const update = await Resturant.findByIdAndUpdate(id, body)
         if (update) return res.send({ "success": true, 'result': update })
         res.send({ "success": false, 'message': 'somthing went wrong' })
