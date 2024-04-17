@@ -7,7 +7,7 @@ const food = new moongose.Schema({
     type: String,
     img: String,
     description: String,
-    special: {}
+    special: []
 
 })
 
